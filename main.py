@@ -45,22 +45,13 @@ def main():
 
 
 def process_image(base_image):
-
     img_undist = undistort.undistort(base_image)
-    #mpimg.imsave('./output_images/{}_undistorted.jpg'.format(name), img_undist)
-
     threshold = Threshold(kernel=3)
     img = threshold.combined_threshold(img_undist)
-    #mpimg.imsave('./output_images/{}_thresholded.jpg'.format(name), img, cmap="gray")
-
     img = warp.warp(img)
-    #mpimg.imsave('./output_images/{}_warped.jpg'.format(name), img, cmap="gray")
-
     left_fit, right_fit = polyfit.polyfit(img, visualize=False)
-
     img = polydraw.draw(img_undist, left_fit, right_fit, warp.Minv)
-
-    #mpimg.imsave('./output_images/{}_final.jpg'.format(name), img, cmap="gray")
+    return img
 
 if __name__ == '__main__':
     main()

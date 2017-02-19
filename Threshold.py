@@ -64,18 +64,11 @@ class Threshold:
         return output
 
     def combined_threshold(self, img):
-        mpimg.imsave('./output_images/inside_threshold.jpg', img)
         directional = self.dir_threshold(img, sobel_kernel=15, thresh=(0.7, 1.3))
-        mpimg.imsave('./output_images/directional_threshold.jpg', directional)
         mag = self.mag_thresh(img, mag_thresh=(50, 255))
-        mpimg.imsave('./output_images/mag_threshold.jpg', mag)
         color = self.color_threshold(img)
-        gradx = self.abs_sobel_thresh(img, orient='x', thresh=(25, 100))
-        grady = self.abs_sobel_thresh(img, orient='y', thresh=(50, 150))
-        mpimg.imsave('./output_images/color_threshold.jpg', color)
-        mpimg.imsave('./output_images/abs_sobel_x.png', gradx)
-        mpimg.imsave('./output_images/abs_sobel_y.png', grady)
+        # gradx = self.abs_sobel_thresh(img, orient='x', thresh=(25, 100))
+        # grady = self.abs_sobel_thresh(img, orient='y', thresh=(50, 150))
         combined_threshold = np.zeros_like(directional).astype(np.uint8)
         combined_threshold[((color == 1) & ((mag == 1) | (directional == 1)))] = 1
-        mpimg.imsave('./output_images/combined.png', combined_threshold)
         return combined_threshold
