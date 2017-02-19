@@ -11,7 +11,7 @@ class Polyfit:
         self.nonzeroy = []
         self.out_img = None
 
-    def polyfit(self, img, visualize=False):
+    def  polyfit(self, img, visualize=False):
         histogram = np.sum(img[int(img.shape[0] / 2):, :], axis=0)
         out_img = np.dstack((img, img, img)) * 255
         midpoint = np.int(histogram.shape[0] / 2)
