@@ -9,7 +9,6 @@ class Warp:
 
 
     def warp(self, img):
-        cv2.imwrite('debug_img.jpg', img)
         return cv2.warpPerspective(img, self.M, (img.shape[1], img.shape[0]), flags=cv2.INTER_LINEAR)
 
     def unwarp(self, img):

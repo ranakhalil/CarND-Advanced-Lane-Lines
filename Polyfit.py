@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 
-
 class Polyfit:
     def __init__(self):
         self.binary_warped = None
@@ -59,8 +58,11 @@ class Polyfit:
         self.rightx = nonzerox[right_lane_inds]
         righty = nonzeroy[right_lane_inds]
 
-        self.left_fit = np.polyfit(lefty, self.leftx, 2)
-        self.right_fit = np.polyfit(righty, self.rightx, 2)
+        if lefty.size > 0:
+            self.left_fit = np.polyfit(lefty, self.leftx, 2)
+
+        if righty.size > 0:
+            self.right_fit = np.polyfit(righty, self.rightx, 2)
 
         if visualize:
             ploty = np.linspace(0, img.shape[0] - 1, img.shape[0])
@@ -103,8 +105,8 @@ class Polyfit:
         # Define y-value where we want radius of curvature
         # I'll choose the maximum y-value, corresponding to the bottom of the image
         y_eval = np.max(ploty)
-        left_curverad = ((1 + (2 * self.left_fit[0] * y_eval + self.left_fit[1]) ** 2) ** 1.5) / np.absolute(2 * self.left_fit[0])
-        right_curverad = ((1 + (2 * self.right_fit[0] * y_eval + self.right_fit[1]) ** 2) ** 1.5) / np.absolute(2 * self.right_fit[0])
+        # left_curverad = ((1 + (2 * self.left_fit[0] * y_eval + self.left_fit[1]) ** 2) ** 1.5) / np.absolute(2 * self.left_fit[0])
+        # right_curverad = ((1 + (2 * self.right_fit[0] * y_eval + self.right_fit[1]) ** 2) ** 1.5) / np.absolute(2 * self.right_fit[0])
 
         left_fit_cr = np.polyfit(ploty * ym_per_pix, leftx * xm_per_pix, 2)
         right_fit_cr = np.polyfit(ploty * ym_per_pix, rightx * xm_per_pix, 2)
@@ -121,4 +123,3 @@ class Polyfit:
         car_pos = ((img.shape[1] / 2) - ((lane_leftx + lane_rightx) / 2)) * xm_per_pix
 
         return (left_curverad + right_curverad) / 2, car_pos.round(2)
-

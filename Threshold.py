@@ -35,10 +35,10 @@ class Threshold:
 
         return binary_output
 
-    def mag_thresh(self, img, mag_thresh=(0, 255)):
+    def mag_thresh(self, img, mag_thresh=(0, 255), sobel_kernel=3):
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=self.sobel_kernel)
-        sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=self.sobel_kernel)
+        sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
+        sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
         gradmag = np.sqrt(sobelx ** 2 + sobely ** 2)
         scale_factor = np.max(gradmag) / 255
         gradmag = (gradmag / scale_factor).astype(np.uint8)
@@ -65,7 +65,7 @@ class Threshold:
 
     def combined_threshold(self, img):
         directional = self.dir_threshold(img, sobel_kernel=15, thresh=(0.7, 1.3))
-        mag = self.mag_thresh(img, mag_thresh=(50, 255))
+        mag = self.mag_thresh(img, mag_thresh=(70, 255), sobel_kernel=9)
         color = self.color_threshold(img)
         # gradx = self.abs_sobel_thresh(img, orient='x', thresh=(25, 100))
         # grady = self.abs_sobel_thresh(img, orient='y', thresh=(50, 150))
