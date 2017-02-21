@@ -46,8 +46,10 @@ def main():
 
 def process_image(base_image):
     img_undist = undistort.undistort(base_image)
+
     threshold = Threshold(kernel=3)
-    img = threshold.combined_threshold(img_undist)
+    blur_img = threshold.gaussian_blur(img_undist, kernel=5)
+    img = threshold.combined_threshold(blur_img)
     img = warp.warp(img)
     left_fit, right_fit = polyfit.polyfit(img, visualize=False)
     img = polydraw.draw(img_undist, left_fit, right_fit, warp.Minv)
