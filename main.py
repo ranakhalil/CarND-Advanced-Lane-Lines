@@ -31,25 +31,21 @@ warp = Warp(src, dst)
 undistort.calibratie_camera()
 
 def main():
-    test_images = ['straight_lines1.jpg', 'straight_lines2.jpg', 'test1.jpg',
-                   'test2.jpg', 'test3.jpg', 'test4.jpg', 'test5.jpg', 'test6.jpg']
-    for image in test_images:
-        img = mpimg.imread('./test_images/' + image)
-        process_image(img, image)
-    white_output = 'project_video_done_2.mp4'
-    clip1 = VideoFileClip('project_video.mp4')
+    # test_images = ['straight_lines1.jpg', 'straight_lines2.jpg', 'test1.jpg',
+    #                'test2.jpg', 'test3.jpg', 'test4.jpg', 'test5.jpg', 'test6.jpg']
+    # for image in test_images:
+    #     img = mpimg.imread('./test_images/' + image)
+    #     process_image(img, image)
+    white_output = 'harder_challenge_video_done_2.mp4'
+    clip1 = VideoFileClip('harder_challenge_video.mp4')
     white_clip = clip1.fl_image(process_image)  # NOTE: this function expects color images!!
     white_clip.write_videofile(white_output, audio=False)
-    del clip1.reader
-    del clip1
 
 
 def process_image(base_image):
     img_undist = undistort.undistort(base_image)
-
     threshold = Threshold(kernel=3)
-    blur_img = threshold.gaussian_blur(img_undist, kernel=5)
-    img = threshold.combined_threshold(blur_img)
+    img = threshold.combined_threshold(img_undist)
     img = warp.warp(img)
     left_fit, right_fit = polyfit.polyfit(img, visualize=False)
     img = polydraw.draw(img_undist, left_fit, right_fit, warp.Minv)
@@ -60,12 +56,17 @@ def process_image(base_image):
     if car_position > 0:
         cv2.putText(img, 'Radius of curvature (Left)  = %.2f m' % (lane_curve), (10, 40), font, 1,
                     (255, 255, 255), 2, cv2.LINE_AA)
+        pos_text = '{}m right of center'.format(car_position)
     else:
         cv2.putText(img, 'Radius of curvature (Right) = %.2f m' % (lane_curve), (10, 70), font, 1,
                     (255, 255, 255), 2, cv2.LINE_AA)
+        pos_text = '{}m left of center'.format(abs(car_position))
 
-    cv2.putText(img, "Lane curve: {}m".format(lane_curve.round()), (10, 50), font, 1,
-                color=(255, 255, 255), thickness=3)
+    cv2.putText(img, "Lane curve: {}m".format(lane_curve.round()), (10, 40), font, 1,
+                color=(255, 255, 255), thickness=2)
+
+    cv2.putText(img, "Car is {}".format(pos_text), (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255, 255, 255),
+                thickness=2)
     return img
 
 if __name__ == '__main__':

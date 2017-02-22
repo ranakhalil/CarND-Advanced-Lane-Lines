@@ -64,7 +64,7 @@ class Threshold:
         return output
 
     # Define a function that thresholds the S-channel of HLS
-    def hls_s(img, thresh=(0, 255)):
+    def hls_s(self, img, thresh=(0, 255)):
         # 1) Convert to HLS color space
         # 2) Apply a threshold to the S channel
         # 3) Return a binary image of threshold result
@@ -74,7 +74,7 @@ class Threshold:
         return s_binary
 
     # Define a function that thresholds the S-channel of HLS
-    def hls_h(img, thresh=(0, 255)):
+    def hls_h(self, img, thresh=(0, 255)):
         # 1) Convert to HLS color space
         # 2) Apply a threshold to the S channel
         # 3) Return a binary image of threshold result
@@ -92,15 +92,22 @@ class Threshold:
         mask = cv2.inRange(img, low_y_w, high_y_w)
         return cv2.bitwise_and(img, img, mask=mask)
 
-    def combined_threshold(self, img):
-        yw = self.yello_white_threshold(self.gaussian_blur(img, kernel=5))
-        directional = self.dir_threshold(yw, sobel_kernel=15, thresh=(0.7, 1.3))
-        mag = self.mag_thresh(yw, mag_thresh=(70, 255), sobel_kernel=9)
+    def combined_threshold(self, image):
+        # Thanks to Denise's help
+        yw = self.yello_white_threshold(image)
         gradx = self.abs_sobel_thresh(yw, orient='x', thresh=(25, 100))
         grady = self.abs_sobel_thresh(yw, orient='y', thresh=(50, 150))
-        # sch = self.hls_s(yw, thresh=(88, 190))
-        # hch = self.hls_h(yw, thresh=(50, 100))
-        combined_threshold = np.zeros_like(directional).astype(np.uint8)
-        combined_threshold[((gradx > 0) | (grady > 0) | (yw == 1) & ((mag == 1) | (directional == 1)))] = 1
-        return combined_threshold
+        magnitude = self.mag_thresh(yw, sobel_kernel=9, mag_thresh=(50, 250))
+        directional = self.dir_threshold(yw, sobel_kernel=15, thresh=(0.7, 1.3))
+        sch = self.hls_s(image, thresh=(88, 190))
+        hch = self.hls_h(image, thresh=(50, 100))
+        shadow = np.zeros_like(directional).astype(np.uint8)
+        shadow[(sch > 0) & (hch > 0)] = 124
+        edge = (image[:, :, 1] / 4).astype(np.uint8)
+        edge = 255 - edge
+        edge[(edge > 210)] = 0
+        combined = np.zeros_like(directional).astype(np.uint8)
+        combined[((gradx > 0) | (grady > 0) | ((magnitude > 0) & (directional > 0)) | (sch > 0)) & (shadow == 0) & (edge > 0)] = 33
+        combined = np.maximum(combined, sch)
+        return combined
 
