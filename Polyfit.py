@@ -115,7 +115,7 @@ class Polyfit:
         print(left_curverad, 'm', right_curverad, 'm')
 
         ratio = left_curverad / right_curverad
-        print('Ratio: ', ratio)
+        # print('Ratio: ', ratio)
 
         lane_leftx = self.left_fit[0] * (img.shape[0] - 1) ** 2 + self.left_fit[1] * (img.shape[0] - 1) + self.left_fit[2]
         lane_rightx = self.right_fit[0] * (img.shape[0] - 1) ** 2 + self.right_fit[1] * (img.shape[0] - 1) + self.right_fit[2]
